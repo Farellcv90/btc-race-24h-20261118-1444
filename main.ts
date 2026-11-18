@@ -9,9 +9,12 @@
 //   Entry, decided on a bar's close (filled at the next bar's open):
 //     close at least 0.8% below the 120-bar EMA  (a deep dip), and
 //     close above the 10-bar EMA                (the turn has started).
+//     No entry is taken before 120 bars of history: the slow EMA needs to
+//     settle first, or it reads the opening price as the trend and fires on
+//     the first shallow bounce instead of the real dip.
 //   Exit, checked on every later bar's close:
 //     the position worth 2% over its cost, or 1% under it, or
-//     360 bars held, whichever comes first.
+//     480 bars held, whichever comes first.
 //
 // Everything is integer arithmetic: closes are integers at price_scale 5, the
 // EMAs are kept as bigints scaled by 1,000,000, and the exit tests compare
@@ -36,7 +39,7 @@ const TAKE_NUM = 102n;
 const STOP_NUM = 99n;
 const EXIT_DEN = 100n;
 /** Give up on a trade after this many bars held. */
-const MAX_HOLD_BARS = 360;
+const MAX_HOLD_BARS = 480;
 /** Reject a fill that moved more than 1% past the close we decided on. */
 const MAX_SLIPPAGE_BPS = 100;
 
@@ -92,6 +95,9 @@ await runBars({
     }
 
     heldSinceSeq = -1;
+    // The slow EMA is seeded from the first close, so it is not a trend
+    // until it has seen a full window of bars; do not enter before then.
+    if (state.seq < SLOW_BARS) return [];
     if (!entrySignal(close)) return [];
     let stake = state.cash;
     const room = state.weightRoom(SYMBOL);

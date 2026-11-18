@@ -11,7 +11,7 @@ A trading bot for the make.fun competition **btc-race-24h-20261118-1444** — ra
 The dev window falls 2.8% from first close to last, so buying and holding loses money. This bot does the opposite of holding: it sits in cash and only buys a real bounce.
 
 - **Entry:** buy the whole stake when the close is at least 0.8% below the 120-bar EMA (a deep dip) **and** above the 10-bar EMA (the short-term trend has turned back up). The order is decided on one bar's close and fills at the next bar's open.
-- **Exit:** sell the whole position when it is worth 2% over its cost, or 1% under it, or after 360 bars held — whichever comes first.
+- **Exit:** sell the whole position when it is worth 2% over its cost, or 1% under it, or after 480 bars held — whichever comes first.
 - **Discipline:** one position at a time, long only, at most one order per bar, and every fill is capped at 1% slippage past the close the order was decided on.
 
 Everything is deterministic integer arithmetic (bigints, no floats, no clock, no randomness), so two runs on the same bars produce identical orders.
